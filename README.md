@@ -1,0 +1,2 @@
+# StudyGroupJavaApi
+Study group organizer
