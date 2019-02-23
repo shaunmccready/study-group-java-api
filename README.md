@@ -1,2 +1,2 @@
 # StudyGroupJavaApi
-Study group organizer
+Study group meeting organizer - Backend
