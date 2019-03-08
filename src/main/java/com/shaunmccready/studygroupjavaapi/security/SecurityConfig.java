@@ -18,7 +18,7 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value(value = "${auth0.apiAudience}")
+    @Value(value = "${auth0.audience}")
     private String apiAudience;
     @Value(value = "${auth0.issuer}")
     private String issuer;
@@ -43,8 +43,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .forRS256(apiAudience, issuer)
                 .configure(http)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/public").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/private").authenticated()
-                .antMatchers(HttpMethod.GET, "/api/private-scoped").hasAuthority("read:messages");
+                .antMatchers(HttpMethod.GET, "/public").permitAll()
+                .antMatchers(HttpMethod.GET, "/private").authenticated()
+                .antMatchers(HttpMethod.GET, "/private-scoped").hasAuthority("read:messages")
+                .anyRequest().authenticated();
     }
 }
