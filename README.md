@@ -18,3 +18,12 @@ For Students to create and manage study groups for classes.
 These groups can then schedule meetings, and each group member can indicate whether they are attending the meeting or not.
 
 
+Context path /api/
+
+Running on port 8080
+
+Build project in command line using: `mvn clean install`
+
+To run the project from the project's root: `mvn spring-boot:run`
+or `java -jar ./target/study-group-meetings-api.jar`
+

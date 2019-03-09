@@ -98,6 +98,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <finalName>study-group-meetings-api</finalName>
     </build>
 
 </project>
