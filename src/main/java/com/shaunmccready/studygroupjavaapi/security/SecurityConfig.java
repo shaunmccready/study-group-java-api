@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -43,9 +43,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .forRS256(apiAudience, issuer)
                 .configure(http)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/public").permitAll()
-                .antMatchers(HttpMethod.GET, "/private").authenticated()
-                .antMatchers(HttpMethod.GET, "/private-scoped").hasAuthority("read:messages")
+                .antMatchers(HttpMethod.GET, "/test/public").permitAll()
+                .antMatchers(HttpMethod.GET, "/test/private").authenticated()
+                .antMatchers(HttpMethod.GET, "/test/private-scoped").hasAuthority("read:messages")
                 .anyRequest().authenticated();
     }
 }

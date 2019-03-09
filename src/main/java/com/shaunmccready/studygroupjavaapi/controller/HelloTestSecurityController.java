@@ -9,10 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
+@RequestMapping("/test")
 public class HelloTestSecurityController {
 
-    @Autowired
     private Auth0 auth0;
+
+    @Autowired
+    public HelloTestSecurityController(Auth0 auth0){
+        this.auth0 = auth0;
+    }
 
 
     @GetMapping("/public")
