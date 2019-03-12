@@ -11,9 +11,14 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.net.AuthRequest;
 import com.auth0.net.Request;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
+@Configuration
 public class Auth0 {
 
 
@@ -30,25 +35,63 @@ public class Auth0 {
     private String apiAudience;
 
 
-    public void testAuth0(String tokenWithBearer) {
-        // DEBUG purposes only
-
-        String token = stripBearer(tokenWithBearer);
-
+    /**
+     * This requests a token from Auth0 in order to make API calls
+     *
+     * @return TokenHolder
+     */
+    @Bean
+    public TokenHolder authTokenHolder() {
         AuthAPI authAPI = new AuthAPI(domain, clientId, clientSecret);
         AuthRequest authRequest = authAPI.requestToken("https://" + domain + "/api/v2/");
+
         TokenHolder holder = null;
         try {
             holder = authRequest.execute();
         } catch (Auth0Exception e) {
             e.printStackTrace();
         }
-        ManagementAPI mgmt = new ManagementAPI(domain, holder.getAccessToken());
-        System.out.println("\n\n" + mgmt.clients());
+
+        return holder;
+    }
+
+
+    /**
+     * This is the Management API for Auth0
+     * Documentation: https://auth0.com/docs/api/management/v2
+     *
+     * @return ManagementAPI
+     */
+    @Bean
+    public ManagementAPI managementAPI() {
+        return new ManagementAPI(domain, authTokenHolder().getAccessToken());
+    }
+
+
+    public User getUserFromToken(String token) {
+        DecodedJWT decode = JWT.decode(token);
+        System.out.println(decode.getSubject());
+
+        Request<User> userRequest = managementAPI().users().get(decode.getSubject(), null);
+        User user = null;
+        try {
+            user = userRequest.execute();
+        } catch (Auth0Exception e) {
+            throw new EntityNotFoundException("Could not find a user in the system with the token provided. Check the info and try again");
+        }
+
+        return user;
+    }
+
+    public void testAuth0(String tokenWithBearer) {
+        // DEBUG purposes only
+        String token = stripBearer(tokenWithBearer);
+
+        System.out.println("\n\n" + managementAPI().clients());
 
         UsersPage listUsers = null;
         try {
-            listUsers = mgmt.users().list(null).execute();
+            listUsers = managementAPI().users().list(null).execute();
         } catch (Auth0Exception e) {
             e.printStackTrace();
         }
@@ -62,25 +105,16 @@ public class Auth0 {
 
         System.out.println("\n\nCurrently logged in User Details:");
 
-        DecodedJWT decode = JWT.decode(token);
-
-        Request<User> userRequest = mgmt.users().get(decode.getSubject(), null);
-        User user = null;
-        try {
-            user = userRequest.execute();
-        } catch (Auth0Exception e) {
-            e.printStackTrace();
-        }
+        User user = getUserFromToken(token);
 
         System.out.println(user.getEmail());
         System.out.println(user.getId());
         System.out.println(user.getPicture());
-
-
     }
 
 
     public String stripBearer(String token) {
         return token.replace("Bearer ", "");
     }
+
 }
