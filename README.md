@@ -25,9 +25,21 @@ For Students to create and manage study groups for classes.
 These groups can then schedule meetings, and each group member can indicate whether they are attending the meeting or not.
 
 
-Context path /api/
+## Installation
 
-Running on port 8080
+- Context path /api/
+- Running on port 8080
+
+You will need to define the following environment variables:
+
+- STUDYGROUPMEETINGS_API_CLIENT_ID
+- STUDYGROUPMEETINGS_API_CLIENT_SECRET
+- STUDYGROUPMEETINGS_API_DOMAIN
+- STUDYGROUPMEETINGS_API_AUTH0_AUDIENCE
+- STUDYGROUPMEETINGS_API_AUTH0_ISSUER
+- STUDYGROUPMEETINGS_DB_POSTGRES_USER
+- STUDYGROUPMEETINGS_DB_POSTGRES_PASSWORD
+- STUDYGROUPMEETINGS_DB_NAME
 
 Build project in command line using: `mvn clean install`
 
