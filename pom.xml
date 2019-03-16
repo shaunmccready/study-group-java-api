@@ -99,7 +99,7 @@
             </plugin>
         </plugins>
 
-        <finalName>study-group-meetings-api</finalName>
+        <finalName>study-group-java-api</finalName>
     </build>
 
 </project>
