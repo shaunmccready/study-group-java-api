@@ -41,8 +41,15 @@ You will need to define the following environment variables:
 - STUDYGROUPMEETINGS_DB_POSTGRES_PASSWORD
 - STUDYGROUPMEETINGS_DB_NAME
 
-Build project in command line using: `mvn clean install`
+Build project as a jar in command line using: `mvn clean install`
 
 To run the project from the project's root: `mvn spring-boot:run`
 or `java -jar ./target/study-group-meetings-api.jar`
+
+## Run via Docker
+1) First build the image using the Dockerfile, for ex:  `docker build -t study-group-java-api .`
+
+2) Then heres a docker run example:
+ 
+ `docker run --name study-group-java-api --rm -p 8080:8080 -e "STUDYGROUPMEETINGS_API_CLIENT_ID=your_auth0_client_id" -e "STUDYGROUPMEETINGS_API_CLIENT_SECRET=your_auth0_client_secret" -e "STUDYGROUPMEETINGS_API_DOMAIN=your_auth0_domain" -e "STUDYGROUPMEETINGS_API_AUTH0_AUDIENCE=your_auth0_audience" -e "STUDYGROUPMEETINGS_API_AUTH0_ISSUER=your_auth0_issuer" -e "STUDYGROUPMEETINGS_DB_POSTGRES_USER=you_postgres_user" -e "STUDYGROUPMEETINGS_DB_POSTGRES_PASSWORD=your_pg_password" -e "STUDYGROUPMEETINGS_DB_NAME=your_pg_db_name" -e "STUDYGROUPMEETINGS_DB_POSTGRES_HOST=0.0.0.0" -e "STUDYGROUPMEETINGS_DB_POSTGRES_PORT=5432" -v "your_hosts_directory":/tmp study-group-java-api`
 
