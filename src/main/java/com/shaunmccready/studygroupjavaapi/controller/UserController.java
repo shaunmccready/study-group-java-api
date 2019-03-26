@@ -3,7 +3,6 @@ package com.shaunmccready.studygroupjavaapi.controller;
 import com.shaunmccready.studygroupjavaapi.domain.User;
 import com.shaunmccready.studygroupjavaapi.security.Auth0;
 import com.shaunmccready.studygroupjavaapi.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +18,6 @@ public class UserController {
     private UserService userService;
 
 
-    @Autowired
     public UserController(Auth0 auth0, UserService userService) {
         this.auth0 = auth0;
         this.userService = userService;
@@ -33,3 +31,4 @@ public class UserController {
         return userService.getUser(token);
     }
 }
+

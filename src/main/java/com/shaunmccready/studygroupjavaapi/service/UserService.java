@@ -25,7 +25,7 @@ public class UserService {
 
 
     public User getUser(String token) {
-        com.auth0.json.mgmt.users.User userFromToken = auth0.getUserFromToken(token);
+        com.auth0.json.mgmt.users.User userFromToken = auth0.getAuth0UserFromToken(token);
         Optional<User> userInDb = userDao.findById(userFromToken.getId());
 
         return userInDb.orElseGet(() -> createNewUserInDatabase(userFromToken));
