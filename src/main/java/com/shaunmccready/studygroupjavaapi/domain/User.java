@@ -3,6 +3,8 @@ package com.shaunmccready.studygroupjavaapi.domain;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user", schema = "public")
@@ -27,6 +29,18 @@ public class User implements Serializable {
     private Date created;
 
     private Date modified;
+
+    private Set<UserGroup> groups = new HashSet<>(0);
+
+    public User setDefaults() {
+        if (created == null){
+            created = new Date();
+        }
+
+        modified = new Date();
+
+        return this;
+    }
 
     @Id
     public String getId() {
@@ -109,6 +123,16 @@ public class User implements Serializable {
 
     public User setModified(Date modified) {
         this.modified = modified;
+        return this;
+    }
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    public Set<UserGroup> getGroups() {
+        return groups;
+    }
+
+    public User setGroups(Set<UserGroup> groups) {
+        this.groups = groups;
         return this;
     }
 }

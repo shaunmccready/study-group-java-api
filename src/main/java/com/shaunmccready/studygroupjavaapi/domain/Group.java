@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "group", schema = "public")
@@ -26,6 +28,8 @@ public class Group implements Serializable {
 
     private Date modified;
 
+    private Set<UserGroup> members = new HashSet<>(0);
+
     public Group() {
     }
 
@@ -35,6 +39,16 @@ public class Group implements Serializable {
         this.ownerId = ownerId;
         this.created = created;
         this.modified = modified;
+    }
+
+    public Group setDefaults() {
+        if (created == null){
+            created = new Date();
+        }
+
+        modified = new Date();
+
+        return this;
     }
 
     @Id
@@ -87,10 +101,13 @@ public class Group implements Serializable {
         return this;
     }
 
-
-    public void setDefaults() {
-        created = new Date();
-        modified = new Date();
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+    public Set<UserGroup> getMembers() {
+        return members;
     }
 
+    public Group setMembers(Set<UserGroup> members) {
+        this.members = members;
+        return this;
+    }
 }
