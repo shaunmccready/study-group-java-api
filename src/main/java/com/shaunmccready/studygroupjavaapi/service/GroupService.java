@@ -20,10 +20,13 @@ public class GroupService {
 
     private UserService userService;
 
-    public GroupService(Auth0 auth0, GroupDao groupDao, UserService userService) {
+    private UserGroupService userGroupService;
+
+    public GroupService(Auth0 auth0, GroupDao groupDao, UserService userService, UserGroupService userGroupService) {
         this.auth0 = auth0;
         this.groupDao = groupDao;
         this.userService = userService;
+        this.userGroupService = userGroupService;
     }
 
 
@@ -36,12 +39,15 @@ public class GroupService {
 
     @Transactional
     public Group createGroup(Group group, String token) {
-        com.auth0.json.mgmt.users.User auth0UserFromToken = auth0.getAuth0UserFromToken(token);
-        User user = userService.getUser(auth0UserFromToken.getId());
+        //com.auth0.json.mgmt.users.User auth0UserFromToken = auth0.getAuth0UserFromToken(token);
+        User user = userService.getUser(token);
 
         Optional<Group> groupInDb = groupDao.findByName(group.getName());
 
-        return groupInDb.orElseGet(() -> createNewGroupInDatabase(group, user.getId()));
+        Group createdGroup = groupInDb.orElseGet(() -> createNewGroupInDatabase(group, user.getId()));
+
+        userGroupService.addMemberToGroup(user, createdGroup);
+        return createdGroup;
     }
 
     private Group createNewGroupInDatabase(Group group, String ownerId) {

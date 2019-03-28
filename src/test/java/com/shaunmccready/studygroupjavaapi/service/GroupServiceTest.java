@@ -61,7 +61,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Testing the single group get")
+    @DisplayName("Testing the single group get - success")
     @Rollback
     @Transactional
     public void getGroupWithIdTest() {
@@ -80,6 +80,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
 
     @Test
+    @DisplayName("Add create new group and add a member - success")
     @Rollback
     void addMemberToGroupTest() {
         // Create user(admin) of group
@@ -123,6 +124,11 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
     }
 
+    /**
+     * This is needed to create the user in the system based on the data returned from Auth0.
+     * Must be called each time a new user is to be created in the DB
+     * @param userId The pre-generated user id
+     */
     void setUpAuth0User(String userId) {
         com.auth0.json.mgmt.users.User auth0User = EntityMockProvider.createAuth0User();
         auth0User.setId(userId);

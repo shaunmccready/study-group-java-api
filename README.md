@@ -43,6 +43,8 @@ You will need to define the following environment variables:
 - STUDYGROUPMEETINGS_DB_POSTGRES_USER
 - STUDYGROUPMEETINGS_DB_POSTGRES_PASSWORD
 - STUDYGROUPMEETINGS_DB_NAME
+- STUDYGROUPMEETINGS_DB_POSTGRES_PORT
+- STUDYGROUPMEETINGS_DB_POSTGRES_HOST
 
 Build project as a jar in command line using: `mvn clean install`
 
