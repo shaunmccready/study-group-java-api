@@ -25,6 +25,7 @@ DO
                     order by grantee desc, privilege_type) THEN
 
         GRANT ALL ON TABLE public.group TO "studygroup-admin";
+        GRANT ALL ON SEQUENCE PUBLIC.group_id_seq TO "studygroup-admin";
 
       END IF;
 
@@ -34,6 +35,8 @@ DO
                       and table_name = 'group'
                     order by grantee desc, privilege_type) THEN
         GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.group TO studygroup_rw;
+        GRANT ALL ON SEQUENCE PUBLIC.group_id_seq TO studygroup_rw;
+
 
       END IF;
 
@@ -71,6 +74,7 @@ DO
                     order by grantee desc, privilege_type) THEN
 
         GRANT ALL ON TABLE public.user_group TO "studygroup-admin";
+        GRANT ALL ON SEQUENCE PUBLIC.user_group_id_seq TO "studygroup-admin";
 
       END IF;
 
@@ -80,6 +84,7 @@ DO
                       and table_name = 'user_group'
                     order by grantee desc, privilege_type) THEN
         GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.user_group TO studygroup_rw;
+        GRANT ALL ON SEQUENCE PUBLIC.user_group_id_seq TO studygroup_rw;
 
       END IF;
 

@@ -27,8 +27,7 @@ public class UserController {
     @GetMapping
     public User getUser(HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
-
-        return userService.getUser(token);
+        return userService.getUserFromToken(token);
     }
 }
 

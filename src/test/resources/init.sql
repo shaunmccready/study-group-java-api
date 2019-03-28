@@ -52,6 +52,7 @@ CREATE TABLE public.group
 
 
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.group TO studygroup_test;
+GRANT ALL ON SEQUENCE PUBLIC.group_id_seq TO studygroup_test;
 
 
 
@@ -74,3 +75,4 @@ CREATE TABLE public.user_group
   TABLESPACE pg_default;
 
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.user_group TO studygroup_test;
+GRANT ALL ON SEQUENCE PUBLIC.user_group_id_seq TO studygroup_test;

@@ -3,6 +3,7 @@ package com.shaunmccready.studygroupjavaapi.controller;
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.mock.EntityMockProvider;
 import com.shaunmccready.studygroupjavaapi.service.GroupService;
+import com.shaunmccready.studygroupjavaapi.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ class GroupControllerTest extends BaseControllerTest {
 
     @MockBean
     private GroupService groupService;
+
+    @MockBean
+    private UserService userService;
 
     @Test
     @WithMockUser

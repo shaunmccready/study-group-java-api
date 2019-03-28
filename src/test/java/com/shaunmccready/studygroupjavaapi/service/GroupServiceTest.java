@@ -47,15 +47,14 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Rollback
     @Transactional
     public void createNewGroupTest() {
-        User user = EntityMockProvider.createUser();
-        setUpAuth0User(user.getId());
+        User user = createAndSaveUserAndSetupAuth0User();
 
         Group group = EntityMockProvider.createGroup("Create Group test");
         group.setOwnerId(user.getId());
 
         String token = "fake_token";
 
-        Group createdGroup = groupService.createGroup(group, token);
+        Group createdGroup = groupService.createGroup(group, user);
         Assertions.assertThat(createdGroup.getId()).isNotNull();
         Assertions.assertThat(createdGroup.getId()).isGreaterThan(0);
     }
@@ -65,14 +64,12 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Rollback
     @Transactional
     public void getGroupWithIdTest() {
-        User user = EntityMockProvider.createUser();
-        setUpAuth0User(user.getId());
+        User user = createAndSaveUserAndSetupAuth0User();
 
         Group group = EntityMockProvider.createGroup("Get Group test");
         group.setOwnerId(user.getId());
 
-        String token = "fake_token";
-        Group createdGroup = groupService.createGroup(group, token);
+        Group createdGroup = groupService.createGroup(group, user);
 
         Group foundGroup = groupService.getGroupById(createdGroup.getId());
         Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.getId());
@@ -84,34 +81,26 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Rollback
     void addMemberToGroupTest() {
         // Create user(admin) of group
-        User user = EntityMockProvider.createUser();
-        userDao.save(user);
-
-        setUpAuth0User(user.getId());
+        User user = createAndSaveUserAndSetupAuth0User();
 
         Group group = EntityMockProvider.createGroup("Get Group test");
         group.setOwnerId(user.getId());
 
-        String token = "fake_token";
-        Group createdGroup = groupService.createGroup(group, token);
+        Group createdGroup = groupService.createGroup(group, user);
 
         Group foundGroup = groupService.getGroupById(createdGroup.getId());
         Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.getId());
 
         Optional<UserGroup> existingUserGroup = userGroupService.findByMemberAndGroup(user.getId(), group.getId());
-        Assertions.assertThat(existingUserGroup.isEmpty()).isTrue();
-
-        // Add the admin user as a member of the group and auto-approved
-        UserGroup userGroup = userGroupService.addMemberToGroup(user, foundGroup);
-        Assertions.assertThat(userGroup.getId()).isNotNull();
-        Assertions.assertThat(userGroup.getApproved()).isTrue();
-
+        Assertions.assertThat(existingUserGroup.isPresent()).isTrue();
+        Assertions.assertThat(existingUserGroup.get().getId()).isNotNull();
+        Assertions.assertThat(existingUserGroup.get().getApproved()).isTrue();
 
         //Add a second regular member to the group
         User regularMember = EntityMockProvider.createUser();
         userDao.save(regularMember);
 
-        userGroup = userGroupService.addMemberToGroup(regularMember, foundGroup);
+        UserGroup userGroup = userGroupService.addMemberToGroup(regularMember, foundGroup);
         Assertions.assertThat(userGroup.getId()).isNotNull();
         Assertions.assertThat(userGroup.getApproved()).isFalse();
 
@@ -124,9 +113,24 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
     }
 
+
+    private User createAndSaveUser() {
+        User user = EntityMockProvider.createUser();
+        userDao.save(user);
+        return user;
+    }
+
+    private User createAndSaveUserAndSetupAuth0User() {
+        User user = createAndSaveUser();
+        setUpAuth0User(user.getId());
+        return user;
+    }
+
+
     /**
      * This is needed to create the user in the system based on the data returned from Auth0.
      * Must be called each time a new user is to be created in the DB
+     *
      * @param userId The pre-generated user id
      */
     void setUpAuth0User(String userId) {

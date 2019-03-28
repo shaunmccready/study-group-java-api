@@ -69,9 +69,7 @@ public class Auth0 {
 
 
     public User getAuth0UserFromToken(String token) {
-        System.out.println("BEFORE :[" + token + "]\n");
         DecodedJWT decode = JWT.decode(token);
-        System.out.println("SUBJECT :[" + decode.getSubject() + "]");
 
         Request<User> userRequest = managementAPI().users().get(decode.getSubject(), null);
         User user;

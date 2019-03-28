@@ -38,10 +38,7 @@ public class GroupService {
 
 
     @Transactional
-    public Group createGroup(Group group, String token) {
-        //com.auth0.json.mgmt.users.User auth0UserFromToken = auth0.getAuth0UserFromToken(token);
-        User user = userService.getUser(token);
-
+    public Group createGroup(Group group, User user) {
         Optional<Group> groupInDb = groupDao.findByName(group.getName());
 
         Group createdGroup = groupInDb.orElseGet(() -> createNewGroupInDatabase(group, user.getId()));
