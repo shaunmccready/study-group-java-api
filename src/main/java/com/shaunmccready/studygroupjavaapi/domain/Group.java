@@ -120,4 +120,21 @@ public class Group implements Serializable {
         this.userGroups = userGroups;
         return this;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return id.equals(group.id) &&
+                name.equals(group.name) &&
+                ownerId.equals(group.ownerId) &&
+                created.equals(group.created) &&
+                modified.equals(group.modified);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, ownerId, created, modified);
+    }
 }

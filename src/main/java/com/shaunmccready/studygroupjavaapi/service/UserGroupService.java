@@ -3,6 +3,7 @@ package com.shaunmccready.studygroupjavaapi.service;
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.domain.User;
 import com.shaunmccready.studygroupjavaapi.domain.UserGroup;
+import com.shaunmccready.studygroupjavaapi.repository.UserDao;
 import com.shaunmccready.studygroupjavaapi.repository.UserGroupDao;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,11 @@ public class UserGroupService {
 
     private UserGroupDao userGroupDao;
 
-    public UserGroupService(UserGroupDao userGroupDao) {
+    private UserDao userDao;
+
+    public UserGroupService(UserGroupDao userGroupDao, UserDao userDao) {
         this.userGroupDao = userGroupDao;
+        this.userDao = userDao;
     }
 
 
@@ -44,4 +48,28 @@ public class UserGroupService {
     Optional<UserGroup> findByMemberAndGroup(String memberId, Long groupId) {
         return userGroupDao.findByMemberIdAndGroupId(memberId, groupId);
     }
+
+
+    /**
+     * Helper method to remove a user from a group
+     */
+    Boolean removeUserFromGroup(User user, Group group) {
+        boolean removed = false;
+
+        if (!user.getId().equals(group.getOwnerId())
+                && !user.getUserGroups().isEmpty()) {
+
+            for (UserGroup userGroup : user.getUserGroups()) {
+                if (userGroup.getGroupId().equals(group.getId())
+                        && userGroup.getMemberId().equals(user.getId())) {
+                    userGroupDao.delete(userGroup);
+                    removed = true;
+                    break;
+                }
+            }
+        }
+
+        return removed;
+    }
+
 }

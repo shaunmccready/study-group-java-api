@@ -3,6 +3,7 @@ package com.shaunmccready.studygroupjavaapi.controller;
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.mock.EntityMockProvider;
 import com.shaunmccready.studygroupjavaapi.service.GroupService;
+import com.shaunmccready.studygroupjavaapi.service.UserGroupService;
 import com.shaunmccready.studygroupjavaapi.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,15 +31,9 @@ class GroupControllerTest extends BaseControllerTest {
     @MockBean
     private UserService userService;
 
-    @Test
-    @WithMockUser
-    void getGroupTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/group/1")
-                .header("Authorization", "Bearer " + "test"))
-//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    @MockBean
+    private UserGroupService userGroupService;
 
-    }
 
     @Test
     @WithMockUser
@@ -51,6 +46,36 @@ class GroupControllerTest extends BaseControllerTest {
                 .content(objectMapper.writeValueAsString(groupToPost)))
 //                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
+
+    @Test
+    @WithMockUser
+    void getGroupTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/group/1")
+                .header("Authorization", "Bearer " + "test"))
+//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
+
+
+    @Test
+    @WithMockUser
+    void joinGroupTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/group/1/join")
+                .header("Authorization", "Bearer " + "test"))
+//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser
+    void leaveGroupTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/group/1/leave")
+                .header("Authorization", "Bearer " + "test"))
+//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
