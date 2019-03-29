@@ -3,7 +3,9 @@ package com.shaunmccready.studygroupjavaapi.service;
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.domain.User;
 import com.shaunmccready.studygroupjavaapi.domain.UserGroup;
+import com.shaunmccready.studygroupjavaapi.dto.GroupDTO;
 import com.shaunmccready.studygroupjavaapi.mock.EntityMockProvider;
+import com.shaunmccready.studygroupjavaapi.repository.GroupDao;
 import com.shaunmccready.studygroupjavaapi.repository.UserDao;
 import com.shaunmccready.studygroupjavaapi.security.Auth0;
 import org.assertj.core.api.Assertions;
@@ -17,9 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 public class GroupServiceTest extends BaseIntegrationTest {
 
 
@@ -31,6 +30,9 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private GroupDao groupDao;
 
     @Autowired
     private UserGroupService userGroupService;
@@ -71,7 +73,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Group createdGroup = groupService.createGroup(group, user);
 
-        Group foundGroup = groupService.getGroupById(createdGroup.getId());
+        GroupDTO foundGroup = groupService.getGroupById(createdGroup.getId());
         Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.getId());
     }
 
@@ -88,8 +90,8 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Group createdGroup = groupService.createGroup(group, user);
 
-        Group foundGroup = groupService.getGroupById(createdGroup.getId());
-        Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.getId());
+        Optional<Group> foundGroup = groupDao.findById(createdGroup.getId());
+        Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.get().getId());
 
         Optional<UserGroup> existingUserGroup = userGroupService.findByMemberAndGroup(user.getId(), group.getId());
         Assertions.assertThat(existingUserGroup.isPresent()).isTrue();
@@ -100,43 +102,18 @@ public class GroupServiceTest extends BaseIntegrationTest {
         User regularMember = EntityMockProvider.createUser();
         userDao.save(regularMember);
 
-        UserGroup userGroup = userGroupService.addMemberToGroup(regularMember, foundGroup);
+        UserGroup userGroup = userGroupService.addMemberToGroup(regularMember, foundGroup.get());
         Assertions.assertThat(userGroup.getId()).isNotNull();
         Assertions.assertThat(userGroup.getApproved()).isFalse();
 
         regularMember = userDao.findById(regularMember.getId()).get();
 
-        Assertions.assertThat(regularMember.getGroups()
+        Assertions.assertThat(regularMember.getUserGroups()
                 .iterator()
                 .next()
                 .getId()).isEqualTo(userGroup.getId());
 
     }
 
-
-    private User createAndSaveUser() {
-        User user = EntityMockProvider.createUser();
-        userDao.save(user);
-        return user;
-    }
-
-    private User createAndSaveUserAndSetupAuth0User() {
-        User user = createAndSaveUser();
-        setUpAuth0User(user.getId());
-        return user;
-    }
-
-
-    /**
-     * This is needed to create the user in the system based on the data returned from Auth0.
-     * Must be called each time a new user is to be created in the DB
-     *
-     * @param userId The pre-generated user id
-     */
-    void setUpAuth0User(String userId) {
-        com.auth0.json.mgmt.users.User auth0User = EntityMockProvider.createAuth0User();
-        auth0User.setId(userId);
-        when(auth0.getAuth0UserFromToken(any(String.class))).thenReturn(auth0User);
-    }
 
 }

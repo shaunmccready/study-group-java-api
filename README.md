@@ -15,6 +15,7 @@ Study group meeting organizer - Backend API
 - [Java v1.8](https://www.oracle.com/technetwork/java/javase/overview/java8-2100321.html)
 - [Auth0 com.shaunmccready.studygroupjavaapi.service for authentication](https://auth0.com/)
 - [PostgreSQL v11 for persistence](https://www.postgresql.org/docs/11/index.html)
+- [MapStruct](http://mapstruct.org/)
 - [Docker CE](https://www.docker.com/why-docker)
 - [Test Containers](https://www.testcontainers.org/)
 - [JUnit 5](https://junit.org/junit5/)

@@ -4,9 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "group", schema = "public")
@@ -28,7 +26,9 @@ public class Group implements Serializable {
 
     private Date modified;
 
-    private Set<UserGroup> members = new HashSet<>(0);
+    private List<User> members = new ArrayList<>(0);
+
+    private Set<UserGroup> userGroups = new HashSet<>(0);
 
     public Group() {
     }
@@ -42,7 +42,7 @@ public class Group implements Serializable {
     }
 
     public Group setDefaults() {
-        if (created == null){
+        if (created == null) {
             created = new Date();
         }
 
@@ -101,13 +101,23 @@ public class Group implements Serializable {
         return this;
     }
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
-    public Set<UserGroup> getMembers() {
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
+    public List<User> getMembers() {
         return members;
     }
 
-    public Group setMembers(Set<UserGroup> members) {
+    public Group setMembers(List<User> members) {
         this.members = members;
+        return this;
+    }
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+    public Set<UserGroup> getUserGroups() {
+        return userGroups;
+    }
+
+    public Group setUserGroups(Set<UserGroup> userGroups) {
+        this.userGroups = userGroups;
         return this;
     }
 }

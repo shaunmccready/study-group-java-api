@@ -2,6 +2,8 @@ package com.shaunmccready.studygroupjavaapi.service;
 
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.domain.User;
+import com.shaunmccready.studygroupjavaapi.dto.GroupDTO;
+import com.shaunmccready.studygroupjavaapi.mapper.GroupMapper;
 import com.shaunmccready.studygroupjavaapi.repository.GroupDao;
 import com.shaunmccready.studygroupjavaapi.security.Auth0;
 import org.assertj.core.api.Assertions;
@@ -22,18 +24,22 @@ public class GroupService {
 
     private UserGroupService userGroupService;
 
-    public GroupService(Auth0 auth0, GroupDao groupDao, UserService userService, UserGroupService userGroupService) {
+    private final GroupMapper groupMapper;
+
+    public GroupService(Auth0 auth0, GroupDao groupDao, UserService userService, UserGroupService userGroupService, GroupMapper groupMapper) {
         this.auth0 = auth0;
         this.groupDao = groupDao;
         this.userService = userService;
         this.userGroupService = userGroupService;
+        this.groupMapper = groupMapper;
     }
 
 
-    public Group getGroupById(Long groupId) {
+    public GroupDTO getGroupById(Long groupId) {
         Optional<Group> groupById = groupDao.findById(groupId);
 
-        return groupById.orElseThrow(() -> new EntityNotFoundException("No group found with ID:" + groupId));
+        Group group = groupById.orElseThrow(() -> new EntityNotFoundException("No group found with ID:" + groupId));
+        return groupMapper.groupToDto(group);
     }
 
 

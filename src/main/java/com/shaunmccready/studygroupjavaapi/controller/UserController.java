@@ -1,11 +1,9 @@
 package com.shaunmccready.studygroupjavaapi.controller;
 
-import com.shaunmccready.studygroupjavaapi.domain.User;
+import com.shaunmccready.studygroupjavaapi.dto.UserDTO;
 import com.shaunmccready.studygroupjavaapi.security.Auth0;
 import com.shaunmccready.studygroupjavaapi.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,10 +22,22 @@ public class UserController {
     }
 
 
-    @GetMapping
-    public User getUser(HttpServletRequest request) {
+    @PostMapping
+    public UserDTO createUser(HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
-        return userService.getUserFromToken(token);
+        return userService.createUserFromToken(token);
+    }
+
+    @GetMapping("/{id}")
+    public UserDTO getUserById(@PathVariable("id") String userId){
+        return userService.getUserById(userId);
+    }
+
+    @PutMapping("/{id}")
+    //TODO: modify the verifyLoggedInUser check to be done via PreAuthorize
+    public UserDTO updateUserById(@PathVariable("id") String userId, @RequestBody UserDTO userDTO, HttpServletRequest request){
+        userService.verifyLoggedInUserIsUpdatingSelf(userId, request.getHeader("Authorization"));
+        return userService.updateUserById(userId, userDTO);
     }
 }
 

@@ -2,9 +2,11 @@ package com.shaunmccready.studygroupjavaapi.controller;
 
 import com.shaunmccready.studygroupjavaapi.domain.Group;
 import com.shaunmccready.studygroupjavaapi.domain.User;
+import com.shaunmccready.studygroupjavaapi.dto.GroupDTO;
 import com.shaunmccready.studygroupjavaapi.security.Auth0;
 import com.shaunmccready.studygroupjavaapi.service.GroupService;
 import com.shaunmccready.studygroupjavaapi.service.UserService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,8 +36,8 @@ public class GroupController {
         return groupService.createGroup(group, user);
     }
 
-    @GetMapping(value = "{id}")
-    public Group getGroup(@PathVariable("id") Long groupId) {
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public GroupDTO getGroup(@PathVariable("id") Long groupId) {
         return groupService.getGroupById(groupId);
     }
 
