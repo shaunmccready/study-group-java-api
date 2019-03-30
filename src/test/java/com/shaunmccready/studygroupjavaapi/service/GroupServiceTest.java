@@ -96,7 +96,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Optional<Group> foundGroup = groupDao.findById(createdGroup.getId());
 
-        if (foundGroup.isEmpty()){
+        if (foundGroup.isEmpty()) {
             fail();
         }
 
@@ -104,7 +104,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Optional<UserGroup> existingUserGroup = userGroupService.findByMemberIdAndGroupId(groupAdmin.getId(), foundGroup.get().getId());
 
-        if (existingUserGroup.isEmpty()){
+        if (existingUserGroup.isEmpty()) {
             fail();
         }
 
@@ -131,7 +131,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Get all groups for a user - success")
     @Rollback
-    void getGroupsByUserIdTest(){
+    void getGroupsByUserIdTest() {
         // Create user(admin) of group
         User groupAdmin = createAndSaveUserAndSetupAuth0User();
 
@@ -149,7 +149,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Join a group test - success")
     @Rollback
-    void joinGroupTest(){
+    void joinGroupTest() {
         // Create user(admin) of group
         User groupAdmin = createAndSaveUserAndSetupAuth0User();
 
@@ -160,7 +160,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Optional<Group> foundGroup = groupDao.findById(createdGroup.getId());
 
-        if (foundGroup.isEmpty()){
+        if (foundGroup.isEmpty()) {
             fail();
         }
 
@@ -168,7 +168,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         Optional<UserGroup> existingUserGroup = userGroupService.findByMemberIdAndGroupId(groupAdmin.getId(), foundGroup.get().getId());
 
-        if (existingUserGroup.isEmpty()){
+        if (existingUserGroup.isEmpty()) {
             fail();
         }
 
@@ -195,7 +195,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Leave a group test - success")
     @Rollback
-    void leaveGroupTest(){
+    void leaveGroupTest() {
         // Create user(admin) of group
         User groupAdmin = createAndSaveUserAndSetupAuth0User();
 
@@ -237,7 +237,7 @@ public class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Delete a group by Admin test - success")
     @Rollback
-    void deleteGroupByAdminTest(){
+    void deleteGroupByAdminTest() {
         // Create user(admin) of group
         User groupAdmin = createAndSaveUserAndSetupAuth0User();
 
@@ -275,18 +275,16 @@ public class GroupServiceTest extends BaseIntegrationTest {
         List<UserGroup> verifyDeleteGroupMembers = userGroupService.findByGroupId(createdGroup.getId());
         Assertions.assertThat(verifyDeleteGroupMembers).isEmpty();
 
-        try {
-            groupService.getGroupById(createdGroup.getId());
-        } catch(EntityNotFoundException ignore){
-            //success!
-        }
+        EntityNotFoundException groupNoLongerExists = assertThrows(EntityNotFoundException.class, () -> groupService.getGroupById(createdGroup.getId()),
+                "Group should have been deleted, therefore cannot be retrieved");
+        Assertions.assertThat(groupNoLongerExists.getMessage()).containsIgnoringCase("No group exists with id:" + createdGroup.getId());
     }
 
 
     @Test()
     @DisplayName("Delete a group by a non-admin test - Fail")
     @Rollback
-    void deleteGroupByNonAdminTest(){
+    void deleteGroupByNonAdminTest() {
         // Create user(admin) of group
         User groupAdmin = createAndSaveUserAndSetupAuth0User();
 
@@ -326,5 +324,99 @@ public class GroupServiceTest extends BaseIntegrationTest {
 
         List<UserGroup> verifyDeleteGroupMembers = userGroupService.findByGroupId(createdGroup.getId());
         Assertions.assertThat(verifyDeleteGroupMembers.isEmpty()).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("Change owner of a group by admin test - success")
+    @Rollback
+    void changeOwnerOfAGroupByAdminTest() {
+        // Create user(admin) of group
+        User groupAdmin = createAndSaveUserAndSetupAuth0User();
+
+        Group group = EntityMockProvider.createGroup("changeOwnerOfAGroupByAdminTest");
+        group.setOwnerId(groupAdmin.getId());
+
+        GroupDTO createdGroup = groupService.createGroup(group, groupAdmin);
+
+        Optional<Group> foundGroup = groupDao.findById(createdGroup.getId());
+        Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.get().getId());
+
+        Optional<UserGroup> existingUserGroup = userGroupService.findByMemberIdAndGroupId(groupAdmin.getId(), foundGroup.get().getId());
+        Assertions.assertThat(existingUserGroup.isPresent()).isTrue();
+        Assertions.assertThat(existingUserGroup.get().getId()).isNotNull();
+        Assertions.assertThat(existingUserGroup.get().getApproved()).isTrue();
+
+        //Add a second regular member to the group
+        User regularMember = EntityMockProvider.createUser();
+        userDao.save(regularMember);
+
+        GroupDTO joinedGroupDTO = groupService.joinGroup(regularMember, foundGroup.get().getId());
+        Assertions.assertThat(joinedGroupDTO.getId()).isNotNull();
+        Assertions.assertThat(joinedGroupDTO.getId()).isGreaterThan(0);
+        Assertions.assertThat(joinedGroupDTO.getOwnerId()).isEqualToIgnoringCase(groupAdmin.getId());
+
+
+        regularMember = userDao.findById(regularMember.getId()).get();
+        UserGroup verifyGroup = regularMember.getUserGroups()
+                .iterator()
+                .next();
+
+        Assertions.assertThat(verifyGroup.getGroupId()).isEqualTo(joinedGroupDTO.getId());
+        Assertions.assertThat(verifyGroup.getApproved()).isFalse();
+
+        //Faking that the admin is logged in
+        groupService.changeOwnerOfGroupByAdmin(groupAdmin.getId(), regularMember.getId(), joinedGroupDTO.getId());
+        GroupDTO verifyNewOwner = groupService.getGroupById(joinedGroupDTO.getId());
+        Assertions.assertThat(verifyNewOwner.getOwnerId()).isEqualToIgnoringCase(regularMember.getId());
+    }
+
+
+    @Test
+    @DisplayName("Change owner of a group by regular user test - fail")
+    @Rollback
+    void changeOwnerOfAGroupByNonAdminTest() {
+        // Create user(admin) of group
+        User groupAdmin = createAndSaveUserAndSetupAuth0User();
+
+        Group group = EntityMockProvider.createGroup("changeOwnerOfAGroupByNonAdminTest");
+        group.setOwnerId(groupAdmin.getId());
+
+        GroupDTO createdGroup = groupService.createGroup(group, groupAdmin);
+
+        Optional<Group> foundGroup = groupDao.findById(createdGroup.getId());
+        Assertions.assertThat(createdGroup.getId()).isEqualTo(foundGroup.get().getId());
+
+        Optional<UserGroup> existingUserGroup = userGroupService.findByMemberIdAndGroupId(groupAdmin.getId(), foundGroup.get().getId());
+        Assertions.assertThat(existingUserGroup.isPresent()).isTrue();
+        Assertions.assertThat(existingUserGroup.get().getId()).isNotNull();
+        Assertions.assertThat(existingUserGroup.get().getApproved()).isTrue();
+
+        //Add a second regular member to the group
+        User regularMember = EntityMockProvider.createUser();
+        userDao.save(regularMember);
+
+        GroupDTO joinedGroupDTO = groupService.joinGroup(regularMember, foundGroup.get().getId());
+        Assertions.assertThat(joinedGroupDTO.getId()).isNotNull();
+        Assertions.assertThat(joinedGroupDTO.getId()).isGreaterThan(0);
+        Assertions.assertThat(joinedGroupDTO.getOwnerId()).isEqualToIgnoringCase(groupAdmin.getId());
+
+
+        final User regularMemberToChangeOwnership = userDao.findById(regularMember.getId()).get();
+        UserGroup verifyGroup = regularMemberToChangeOwnership.getUserGroups()
+                .iterator()
+                .next();
+
+        Assertions.assertThat(verifyGroup.getGroupId()).isEqualTo(joinedGroupDTO.getId());
+        Assertions.assertThat(verifyGroup.getApproved()).isFalse();
+
+
+        PersistenceException persistenceExceptionFromNonAdmin = assertThrows(PersistenceException.class,
+                () -> groupService.changeOwnerOfGroupByAdmin(regularMemberToChangeOwnership.getId(), regularMemberToChangeOwnership.getId(), joinedGroupDTO.getId()),
+                "Only Admins should be able to change owner of groups");
+        Assertions.assertThat(persistenceExceptionFromNonAdmin.getMessage()).containsIgnoringCase("Unable to change owner of the group. Only the Admin/Owner of the group can do this");
+
+        GroupDTO verifySameOwner = groupService.getGroupById(joinedGroupDTO.getId());
+        Assertions.assertThat(verifySameOwner.getOwnerId()).isEqualToIgnoringCase(groupAdmin.getId());
     }
 }

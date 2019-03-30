@@ -28,27 +28,57 @@ public class UserController {
     }
 
 
+    /**
+     * Create new User in the system using the auth token and information obtained from Authentication provider
+     *
+     * @return UserDTO
+     */
     @PostMapping
     public UserDTO createUser(HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         return userService.createUserFromToken(token);
     }
 
+
+    /**
+     * Get a single user by id
+     *
+     * @param userId user Id of user
+     * @return UserDTO
+     */
     @GetMapping("/{id}")
     public UserDTO getUserById(@PathVariable("id") String userId) {
         return userService.getUserById(userId);
     }
 
+
+    /**
+     * Update user info by the owner of the account
+     *
+     * @param userId  user Id of user to modify
+     * @param userDTO fields to modify
+     * @return UserDTO
+     */
     @PutMapping("/{id}")
     //TODO: modify the verifyLoggedInUser check to be done via PreAuthorize
-    public UserDTO updateUserById(@PathVariable("id") String userId, @RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public UserDTO updateUserById(@PathVariable("id") String userId,
+                                  @RequestBody UserDTO userDTO,
+                                  HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         userService.verifyLoggedInUserIsUpdatingSelf(userId, token);
         return userService.updateUserById(userId, userDTO);
     }
 
+
+    /**
+     * Get all groups that a user is subscribed to
+     *
+     * @param userId user Id of user
+     * @return List<GroupDTO>
+     */
     @GetMapping("/{id}/group")
-    public List<GroupDTO> getGroupsForUser(@PathVariable("id") String userId, HttpServletRequest request) {
+    public List<GroupDTO> getGroupsForUser(@PathVariable("id") String userId,
+                                           HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         userService.verifyLoggedInUserIsUpdatingSelf(userId, token);
         return groupService.getGroupsByUserId(userId);

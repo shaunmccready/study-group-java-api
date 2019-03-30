@@ -109,17 +109,17 @@ public class GroupService {
     public GroupDTO deleteGroup(User user, Long groupId) {
         Group group = getGroup(groupId);
 
-        if(user.getId().equalsIgnoreCase(group.getOwnerId())){
+        if (user.getId().equalsIgnoreCase(group.getOwnerId())) {
             groupDao.delete(group);
             userGroupService.deleteGroup(group.getId());
             return groupMapper.groupToDto(group);
-        } else{
+        } else {
             throw new PersistenceException("Unable to delete the group. Only the Admin/Owner of the group can do this");
         }
     }
 
 
-    private Group getGroup(Long groupId){
+    private Group getGroup(Long groupId) {
         Optional<Group> group = groupDao.findById(groupId);
 
         if (group.isEmpty()) {
@@ -127,5 +127,26 @@ public class GroupService {
         }
 
         return group.get();
+    }
+
+
+    public GroupDTO changeOwnerOfGroupByAdmin(String currentOwnerId, String newOwnerId, Long groupId) {
+        verifyOwnerOfGroup(currentOwnerId, groupId);
+        return changeOwnerOfGroup(newOwnerId, groupId);
+    }
+
+
+    private void verifyOwnerOfGroup(String loggedInUserId, Long groupId) {
+        Group group = getGroup(groupId);
+        if (!group.getOwnerId().equalsIgnoreCase(loggedInUserId)) {
+            throw new PersistenceException("Unable to change owner of the group. Only the Admin/Owner of the group can do this");
+        }
+    }
+
+
+    private GroupDTO changeOwnerOfGroup(String newOwnerId, Long groupId) {
+        Group group = getGroup(groupId);
+        group.setOwnerId(newOwnerId);
+        return groupMapper.groupToDto(groupDao.save(group));
     }
 }

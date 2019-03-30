@@ -1,6 +1,7 @@
 package com.shaunmccready.studygroupjavaapi.controller;
 
 import com.shaunmccready.studygroupjavaapi.domain.Group;
+import com.shaunmccready.studygroupjavaapi.domain.User;
 import com.shaunmccready.studygroupjavaapi.mock.EntityMockProvider;
 import com.shaunmccready.studygroupjavaapi.service.GroupService;
 import com.shaunmccready.studygroupjavaapi.service.UserGroupService;
@@ -16,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import static org.mockito.Mockito.when;
 
 
 @WebMvcTest(controllers = GroupController.class)
@@ -84,6 +87,19 @@ class GroupControllerTest extends BaseControllerTest {
     @WithMockUser
     void deleteGroupTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/group/1")
+                .header("Authorization", "Bearer " + "test"))
+//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser
+    void changeOwnerOfGroupTest() throws Exception {
+        User user = EntityMockProvider.createUser();
+        when(userService.getUserFromToken("test")).thenReturn(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/group/1/changeOwner/123456abcdef")
                 .header("Authorization", "Bearer " + "test"))
 //                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk());

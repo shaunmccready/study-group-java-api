@@ -45,18 +45,17 @@ class UserServiceTest extends BaseIntegrationTest {
         User originalUser = createAndSaveUserAndSetupAuth0User();
         UserDTO updatedUserDto = new UserDTO()
                 .setEmail("updatecheck@test.com")
-                .setName("updated name");
+                .setName("updated name")
+                .setGivenName("New-given-name");
 
         UserDTO userToVerifyUpdate = userService.updateUserById(originalUser.getId(), updatedUserDto);
         Assertions.assertThat(userToVerifyUpdate.getId()).isEqualToIgnoringCase(originalUser.getId());
         Assertions.assertThat(userToVerifyUpdate.getEmail()).isEqualToIgnoringCase("updatecheck@test.com");
         Assertions.assertThat(userToVerifyUpdate.getEmailVerified()).isEqualTo(originalUser.getEmailVerified());
         Assertions.assertThat(userToVerifyUpdate.getName()).isEqualToIgnoringCase("updated name");
-        Assertions.assertThat(userToVerifyUpdate.getGivenName()).isEqualToIgnoringCase(originalUser.getGivenName());
+        Assertions.assertThat(userToVerifyUpdate.getGivenName()).isEqualToIgnoringCase("New-given-name");
         Assertions.assertThat(userToVerifyUpdate.getFamilyName()).isEqualToIgnoringCase(originalUser.getFamilyName());
         Assertions.assertThat(userToVerifyUpdate.getPicture()).isEqualToIgnoringCase(originalUser.getPicture());
         Assertions.assertThat(userToVerifyUpdate.getModified()).isAfterOrEqualsTo(originalUser.getModified());
-
-
     }
 }

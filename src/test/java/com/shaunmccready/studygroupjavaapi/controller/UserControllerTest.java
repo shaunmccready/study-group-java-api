@@ -62,4 +62,13 @@ class UserControllerTest extends BaseControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+
+
+    @Test
+    @WithMockUser
+    void getGroupsForUserTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/1/group")
+                .header("Authorization", "Bearer " + "test"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

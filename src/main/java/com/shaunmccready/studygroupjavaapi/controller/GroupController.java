@@ -40,7 +40,8 @@ public class GroupController {
      * @return GroupDTO
      */
     @PostMapping()
-    public GroupDTO createGroup(@RequestBody Group group, HttpServletRequest request) {
+    public GroupDTO createGroup(@RequestBody Group group,
+                                HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         User user = userService.getUserFromToken(token);
 
@@ -67,7 +68,8 @@ public class GroupController {
      * @return GroupDTO
      */
     @PostMapping("/{id}/join")
-    public GroupDTO joinGroup(@PathVariable("id") Long groupId, HttpServletRequest request) {
+    public GroupDTO joinGroup(@PathVariable("id") Long groupId,
+                              HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         User user = userService.getUserFromToken(token);
 
@@ -83,19 +85,46 @@ public class GroupController {
      * @return GroupDTO
      */
     @PostMapping("/{id}/leave")
-    public GroupDTO leaveGroup(@PathVariable("id") Long groupId, HttpServletRequest request) {
+    public GroupDTO leaveGroup(@PathVariable("id") Long groupId,
+                               HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         User user = userService.getUserFromToken(token);
 
         return groupService.leaveGroup(user, groupId);
     }
 
+
+    /**
+     * Delete a group by Admin and remove all members
+     *
+     * @param groupId group Id to delete
+     * @return GroupDTO
+     */
     @DeleteMapping("/{id}")
-    public GroupDTO deleteGroup(@PathVariable("id") Long groupId, HttpServletRequest request) {
+    public GroupDTO deleteGroup(@PathVariable("id") Long groupId,
+                                HttpServletRequest request) {
         String token = auth0.stripBearer(request.getHeader("Authorization"));
         User user = userService.getUserFromToken(token);
 
         return groupService.deleteGroup(user, groupId);
+    }
+
+
+    /**
+     * Change owner/admin of a group By the current admin
+     *
+     * @param groupId group to change
+     * @param newOwnerId new owner id
+     * @return GroupDTO
+     */
+    @PutMapping("/{groupId}/changeOwner/{newOwnerId}")
+    public GroupDTO changeOwnerOfGroup(@PathVariable("groupId") Long groupId,
+                                       @PathVariable("newOwnerId") String newOwnerId,
+                                       HttpServletRequest request) {
+        String token = auth0.stripBearer(request.getHeader("Authorization"));
+        User loggedUser = userService.getUserFromToken(token);
+
+        return groupService.changeOwnerOfGroupByAdmin(loggedUser.getId(), newOwnerId, groupId);
     }
 
 }
