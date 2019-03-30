@@ -51,7 +51,7 @@ public class GroupController {
     /**
      * Retrieving a group by id
      *
-     * @param groupId
+     * @param groupId group Id to get
      * @return GroupDTO
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -63,8 +63,7 @@ public class GroupController {
     /**
      * Joining an existing group
      *
-     * @param groupId
-     * @param request
+     * @param groupId group Id to join
      * @return GroupDTO
      */
     @PostMapping("/{id}/join")
@@ -80,8 +79,7 @@ public class GroupController {
      * Leave a group that you're already assigned to.
      * Owners cannot leave, they can only change ownership or delete
      *
-     * @param groupId
-     * @param request
+     * @param groupId group Id to leave
      * @return GroupDTO
      */
     @PostMapping("/{id}/leave")
@@ -92,5 +90,12 @@ public class GroupController {
         return groupService.leaveGroup(user, groupId);
     }
 
+    @DeleteMapping("/{id}")
+    public GroupDTO deleteGroup(@PathVariable("id") Long groupId, HttpServletRequest request) {
+        String token = auth0.stripBearer(request.getHeader("Authorization"));
+        User user = userService.getUserFromToken(token);
+
+        return groupService.deleteGroup(user, groupId);
+    }
 
 }

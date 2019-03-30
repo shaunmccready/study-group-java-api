@@ -78,4 +78,14 @@ class GroupControllerTest extends BaseControllerTest {
 //                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+
+    @Test
+    @WithMockUser
+    void deleteGroupTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/group/1")
+                .header("Authorization", "Bearer " + "test"))
+//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

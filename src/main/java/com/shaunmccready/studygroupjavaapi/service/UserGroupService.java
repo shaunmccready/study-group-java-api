@@ -6,7 +6,9 @@ import com.shaunmccready.studygroupjavaapi.domain.UserGroup;
 import com.shaunmccready.studygroupjavaapi.repository.UserDao;
 import com.shaunmccready.studygroupjavaapi.repository.UserGroupDao;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,8 +47,13 @@ public class UserGroupService {
     }
 
 
-    Optional<UserGroup> findByMemberAndGroup(String memberId, Long groupId) {
+    Optional<UserGroup> findByMemberIdAndGroupId(String memberId, Long groupId) {
         return userGroupDao.findByMemberIdAndGroupId(memberId, groupId);
+    }
+
+
+    List<UserGroup> findByGroupId(Long groupId) {
+        return userGroupDao.findByGroupId(groupId);
     }
 
 
@@ -72,4 +79,9 @@ public class UserGroupService {
         return removed;
     }
 
+
+    @Transactional
+    public void deleteGroup(Long groupId) {
+        userGroupDao.deleteAllWithGroupId(groupId);
+    }
 }

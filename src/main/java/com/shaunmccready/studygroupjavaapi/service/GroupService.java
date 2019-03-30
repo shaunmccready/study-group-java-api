@@ -40,10 +40,7 @@ public class GroupService {
 
 
     public GroupDTO getGroupById(Long groupId) {
-        Optional<Group> groupById = groupDao.findById(groupId);
-
-        Group group = groupById.orElseThrow(() -> new EntityNotFoundException("No group found with ID:" + groupId));
-        return groupMapper.groupToDto(group);
+        return groupMapper.groupToDto(getGroup(groupId));
     }
 
 
@@ -84,14 +81,13 @@ public class GroupService {
 
 
     public GroupDTO joinGroup(User user, Long groupId) {
-        Optional<Group> group = groupDao.findById(groupId);
+        Group group = getGroup(groupId);
 
 
-        UserGroup userGroup = userGroupService.addMemberToGroup(user,
-                group.orElseThrow(() -> new EntityNotFoundException("Group with Id" + groupId + " does not exist in the system")));
+        UserGroup userGroup = userGroupService.addMemberToGroup(user, group);
 
-        if (userGroup != null && userGroup.getGroupId().equals(group.get().getId())) {
-            return groupMapper.groupToDto(group.get());
+        if (userGroup != null && userGroup.getGroupId().equals(group.getId())) {
+            return groupMapper.groupToDto(group);
         } else {
             throw new PersistenceException("Unable to join the group");
         }
@@ -99,19 +95,37 @@ public class GroupService {
 
 
     public GroupDTO leaveGroup(User user, Long groupId) {
-        Optional<Group> group = groupDao.findById(groupId);
+        Group group = getGroup(groupId);
 
-        if (group.isEmpty()) {
-            throw new EntityNotFoundException("No group exists with id:" + groupId);
-        }
-
-        Boolean removed = userGroupService.removeUserFromGroup(user, group.get());
+        Boolean removed = userGroupService.removeUserFromGroup(user, group);
         if (removed) {
-            return groupMapper.groupToDto(group.get());
+            return groupMapper.groupToDto(group);
         } else {
             throw new PersistenceException("Unable to leave the group");
         }
     }
 
 
+    public GroupDTO deleteGroup(User user, Long groupId) {
+        Group group = getGroup(groupId);
+
+        if(user.getId().equalsIgnoreCase(group.getOwnerId())){
+            groupDao.delete(group);
+            userGroupService.deleteGroup(group.getId());
+            return groupMapper.groupToDto(group);
+        } else{
+            throw new PersistenceException("Unable to delete the group. Only the Admin/Owner of the group can do this");
+        }
+    }
+
+
+    private Group getGroup(Long groupId){
+        Optional<Group> group = groupDao.findById(groupId);
+
+        if (group.isEmpty()) {
+            throw new EntityNotFoundException("No group exists with id:" + groupId);
+        }
+
+        return group.get();
+    }
 }
