@@ -1,8 +1,10 @@
 package com.shaunmccready.studygroupjavaapi.domain;
 
+import org.hibernate.annotations.WhereJoinTable;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "user", schema = "public")
@@ -27,6 +29,20 @@ public class User implements Serializable {
     private Date created;
 
     private Date modified;
+
+    private List<Group> groups = new ArrayList<>(0);
+
+    private Set<UserGroup> userGroups = new HashSet<>(0);
+
+    public User setDefaults() {
+        if (created == null) {
+            created = new Date();
+        }
+
+        modified = new Date();
+
+        return this;
+    }
 
     @Id
     public String getId() {
@@ -109,6 +125,30 @@ public class User implements Serializable {
 
     public User setModified(Date modified) {
         this.modified = modified;
+        return this;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @JoinTable(name = "user_group", schema = "public", joinColumns = {
+            @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "group_id", referencedColumnName = "id", nullable = false, updatable = false)})
+    @WhereJoinTable(clause = "approved = true")
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public User setGroups(List<Group> groups) {
+        this.groups = groups;
+        return this;
+    }
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    public Set<UserGroup> getUserGroups() {
+        return userGroups;
+    }
+
+    public User setUserGroups(Set<UserGroup> userGroups) {
+        this.userGroups = userGroups;
         return this;
     }
 }

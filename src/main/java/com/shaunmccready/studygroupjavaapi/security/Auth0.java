@@ -68,12 +68,11 @@ public class Auth0 {
     }
 
 
-    public User getUserFromToken(String token) {
+    public User getAuth0UserFromToken(String token) {
         DecodedJWT decode = JWT.decode(token);
-        System.out.println(decode.getSubject());
 
         Request<User> userRequest = managementAPI().users().get(decode.getSubject(), null);
-        User user = null;
+        User user;
         try {
             user = userRequest.execute();
         } catch (Auth0Exception e) {
@@ -105,7 +104,7 @@ public class Auth0 {
 
         System.out.println("\n\nCurrently logged in User Details:");
 
-        User user = getUserFromToken(token);
+        User user = getAuth0UserFromToken(token);
 
         System.out.println(user.getEmail());
         System.out.println(user.getId());
