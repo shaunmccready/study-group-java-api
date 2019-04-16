@@ -1,5 +1,8 @@
 # Study Group Meetings Backend Java Api
 
+[![Build Status](https://travis-ci.org/shaunmccready/study-group-java-api.svg?branch=master)](https://travis-ci.org/shaunmccready/study-group-java-api)
+
+
 Study group meeting organizer - Backend API
 
 * _ReactJs user interface repository is located at (https://github.com/pachoclo/study-group-react-ui)_
