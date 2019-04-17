@@ -1,7 +1,7 @@
 # Study Group Meetings Backend Java Api
 
 [![Build Status](https://travis-ci.org/shaunmccready/study-group-java-api.svg?branch=master)](https://travis-ci.org/shaunmccready/study-group-java-api)
-[![codecov](https://codecov.io/gh/TechnionYP5777/study-group-java-api/branch/master/graph/badge.svg)](https://codecov.io/gh/TechnionYP5777/study-group-java-api)
+[![codecov](https://codecov.io/gh/shaunmccready/study-group-java-api/branch/master/graph/badge.svg)](https://codecov.io/gh/shaunmccready/study-group-java-api)
 
 Study group meeting organizer - Backend API
 
