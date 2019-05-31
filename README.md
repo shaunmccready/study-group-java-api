@@ -2,8 +2,9 @@
 
 [![Build Status](https://travis-ci.org/shaunmccready/study-group-java-api.svg?branch=master)](https://travis-ci.org/shaunmccready/study-group-java-api)
 [![Code Coverage](https://codecov.io/github/shaunmccready/study-group-java-api/branch/master/graph/badge.svg)](https://codecov.io/gh/shaunmccready/study-group-java-api)
+[![Known Vulnerabilities](https://snyk.io/test/github/shaunmccready/study-group-java-api/badge.svg)](https://snyk.io/test/github/shaunmccready/study-group-java-api)
 
-Study group meeting organizer - Backend API
+#### Study group meeting organizer - Backend API
 
 * _ReactJs user interface repository is located at (https://github.com/pachoclo/study-group-react-ui)_
 
